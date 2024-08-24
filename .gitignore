@@ -1,0 +1,4 @@
+local_test.py
+*.pyc
+.DS_Store
+test_*.py
