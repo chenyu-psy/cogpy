@@ -62,11 +62,10 @@ The `arrange_grid` function arranges stimuli in a grid. The `nrow` and `ncol` pa
 
 ```python
 from cogpy import stimBoxes
-from psychopy.visual import Window
-from psychopy import core
+from psychopy import core, visual
 
 # open window
-win = Window(size=[1600,900],color=[1,1,1], fullscr=False)
+win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
 
 circle_boxes = stimBoxes(win, setsize = 6, width = 0.16)
 circle_boxes.arrange_grid(nrow=3, ncol=2, spH=0.05, spW=0.05)
