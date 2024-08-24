@@ -118,7 +118,7 @@ circle_boxes.arrange_custom(positions = {
     'P5':[0,0.3],
     'P6':[0,-0.3]}
     )
-circle_boxes.stim_text(text = ['A','B','C','D','E','F'], height = 0.8, color="#bababa")
+circle_boxes.stim_text(text = ['A','B','C','D','E','F'], height = 0.08, color="#bababa")
 
 circle_boxes.draw()
 core.wait(20)
