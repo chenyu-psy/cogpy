@@ -135,8 +135,6 @@ core.wait(20)
 from cogpy import stimBoxes, trial
 from psychopy import core, visual
 
-import numpy as np
-
 # open window
 win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
 
@@ -164,8 +162,6 @@ print(results)
 # %% Import libraries
 from cogpy import stimBoxes, trial
 from psychopy import core, visual
-
-import numpy as np
 
 # open window
 win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
