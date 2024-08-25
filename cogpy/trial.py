@@ -33,11 +33,7 @@ class trial(object):
         self.response = None
         self.rt = None
         
-        if resp_type == "key":
-            self.key_response()
-        elif resp_type == "button":
-            self.button_response()
-        else:
+        if resp_type not in ["key", "button"]:
             raise ValueError("The response type is not recognized")
     
     def key_response(self):
@@ -128,6 +124,17 @@ class trial(object):
             # check if the time is over
             if core.getTime() - start_time > self.duration:
                 loop = False
+    
+    def run(self):
+        
+        if self.resp_type == "key":
+            self.key_response()
+        elif self.resp_type == "button":
+            self.button_response()
+    
+    def update_stimuli(self, stimuli:list):
+        
+        self.stimuli = stimuli
     
     def get_response(self):
         return {

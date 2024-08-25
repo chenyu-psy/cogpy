@@ -151,6 +151,7 @@ test_trial = trial(
     resp_end_trial = True, 
     duration = 20)
 
+test_trial.run()
 results = test_trial.get_response()
 print(results)
 
@@ -179,6 +180,7 @@ test_trial = trial(
     resp_end_trial = True, 
     duration = 20)
 
+test_trial.run()
 results = test_trial.get_response()
 print(results)
 ```
