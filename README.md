@@ -123,3 +123,66 @@ circle_boxes.stim_text(text = ['A','B','C','D','E','F'], height = 0.08, color="#
 circle_boxes.draw()
 core.wait(20)
 ```
+
+## Trial
+
+`trial` is a class that helps to present stimuli and collect responses. It supports both keyboard and button responses.
+
+### Keyboard response
+
+```python
+# %% Import libraries
+from cogpy import stimBoxes, trial
+from psychopy import core, visual
+
+import numpy as np
+
+# open window
+win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
+
+circle_boxes = stimBoxes(win, setsize = 6, width = 0.1)
+circle_boxes.arrange_circle(radius = 0.3, rotation=120)
+circle_boxes.stim_text(text = ['A','B','C','D','E','F'], height = 0.08, color="#bababa")
+
+test_trial = trial(
+    win, 
+    stimuli = [circle_boxes], 
+    resp_type = "key", 
+    choices = ['space'], 
+    resp_start = 3, 
+    resp_end_trial = True, 
+    duration = 20)
+
+results = test_trial.get_response()
+print(results)
+
+```
+
+### Button response
+
+```python
+# %% Import libraries
+from cogpy import stimBoxes, trial
+from psychopy import core, visual
+
+import numpy as np
+
+# open window
+win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
+
+circle_boxes = stimBoxes(win, setsize = 6, width = 0.1)
+circle_boxes.arrange_circle(radius = 0.3, rotation=120)
+circle_boxes.stim_text(text = ['A','B','C','D','E','F'], height = 0.08, color="#bababa")
+
+test_trial = trial(
+    win, 
+    stimuli = [circle_boxes], 
+    resp_type = "button", 
+    choices = ['hello', 'world'], 
+    resp_start = 3, 
+    resp_end_trial = True, 
+    duration = 20)
+
+results = test_trial.get_response()
+print(results)
+```
