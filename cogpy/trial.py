@@ -8,7 +8,7 @@ import numpy as np
 
 class trial(object):
     
-    def __init__(self, win, stimuli:list, resp_type = "key", choices:list|object|None=None, resp_start=0, resp_end_trial=True, duration=float('inf')):
+    def __init__(self, win, stimuli:list, resp_type = "key", choices:list|object|None=None, resp_start=0, resp_end_trial=True, duration=float('inf'), post_trial_gap=0):
         ''' Display stimuli and collect responses
 
         Args:
@@ -30,8 +30,10 @@ class trial(object):
         self.resp_start = resp_start
         self.resp_end_trial = resp_end_trial
         self.duration = duration
+        self.post_trial_gap = post_trial_gap
         self.response = None
         self.rt = None
+        
         
         if resp_type not in ["key", "button"]:
             raise ValueError("The response type is not recognized")
@@ -45,14 +47,12 @@ class trial(object):
         # get the start time of the trial
         start_time = core.getTime() 
         
-        # Present stimulation but prohibit response
-        if self.resp_start != 0:
-            
-            for stim in self.stimuli:
-                stim.draw()
+        # Present stimulation but prohibit response  
+        for stim in self.stimuli:
+            stim.draw()
 
-            self.win.flip()
-            core.wait(self.resp_start)
+        self.win.flip()
+        core.wait(self.resp_start)
         
         # initialize the loop and mouse
         loop = True
@@ -97,13 +97,11 @@ class trial(object):
         start_time = core.getTime() 
         
         # Present stimulation but prohibit response
-        if self.resp_start != 0:
-            
-            for stim in self.stimuli:
-                stim.draw()
-            self.buttons.draw()
-            self.win.flip()
-            core.wait(self.resp_start)
+        for stim in self.stimuli:
+            stim.draw()
+        self.buttons.draw()
+        self.win.flip()
+        core.wait(self.resp_start)
 
         # initialize the loop
         loop = True
@@ -131,6 +129,10 @@ class trial(object):
             self.key_response()
         elif self.resp_type == "button":
             self.button_response()
+        
+        if self.post_trial_gap > 0:
+            self.win.flip()
+            core.wait(self.post_trial_gap)
     
     def update_stimuli(self, win, stimuli:list):
         ''' Update the stimuli
@@ -142,6 +144,10 @@ class trial(object):
         
         self.win = win
         self.stimuli = stimuli
+        
+        # reset the response
+        self.response = None
+        self.rt = None
     
     def get_response(self):
         return {
