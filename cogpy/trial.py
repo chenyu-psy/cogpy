@@ -132,8 +132,15 @@ class trial(object):
         elif self.resp_type == "button":
             self.button_response()
     
-    def update_stimuli(self, stimuli:list):
+    def update_stimuli(self, win, stimuli:list):
+        ''' Update the stimuli
+
+        Args:
+            win (Any): the window object from psychopy
+            stimuli (list): a list of stimuli objects
+        '''
         
+        self.win = win
         self.stimuli = stimuli
     
     def get_response(self):
