@@ -7,9 +7,7 @@ from .layout import stimBoxes
 import numpy as np
 
 class trial(object):
-    
-    def __init__(self, win, stimuli:list, resp_type = "key", choices:list|object|None=None, resp_start=0, resp_end_trial=True, duration=float('inf'), post_trial_gap=0):
-        ''' Display stimuli and collect responses
+    ''' Display stimuli and collect responses
 
         Args:
             win (object): the window object from psychopy
@@ -19,10 +17,13 @@ class trial(object):
             resp_start (int, optional): the time before the response is allowed. Defaults to 0.
             resp_end_trial (bool, optional): whether the trial ends after the response. Defaults to True.
             duration (_type_, optional): the maximum duration of the trial. Defaults to float('inf').
+            post_trial_gap (float, optional): the time after the trial. Defaults to 0.
 
         Raises:
             ValueError: The response type is not recognized
         '''
+    
+    def __init__(self, win, stimuli:list, resp_type = "key", choices:list|object|None=None, resp_start=0, resp_end_trial=True, duration=float('inf'), post_trial_gap=0):
         self.win = win
         self.stimuli = stimuli
         self.resp_type = resp_type
@@ -150,6 +151,11 @@ class trial(object):
         self.rt = None
     
     def get_response(self):
+        ''' Get the response
+
+        Returns:
+            dict: the response and the response time
+        '''
         return {
             "response":self.response,
             "rt":self.rt
