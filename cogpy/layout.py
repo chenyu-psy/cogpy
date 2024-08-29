@@ -61,14 +61,14 @@ class stimBoxes(object):
             # set the position of the box
             self.boxes[f"P{i+1}"] = Rect(self.win, pos = [x, y], **self.box_args)
     
-    def arrange_line(self, cent=[0,0], direction="horizontal", spacing:float|None=None):
+    def arrange_line(self, cent=[0,0], direction="horizontal", spacing:float=0):
         '''Arrange the boxes in a line
 
         Args:
             direction (str, optional): The direction of the line. 
                 The default value is "horizontal".
             cent (list, optional): The center of the line. Defaults to [0,0].
-            spacing (float, optional): The spacing between boxes. Defaults to None.
+            spacing (float, optional): The spacing between boxes. Defaults to 0.
         '''
         n = self.setsize # number of boxes
         width = self.box_args["width"]
@@ -278,12 +278,6 @@ class stimBoxes(object):
                 If a list is provided, the images will be added to the boxes in order.
                 If a dictionary is provided, the images will be added to the boxes based on the keys.
         '''
-        
-        if "height" not in args: args["height"] = 0.16
-        if args.get("units", "height") != "height":
-            raise ValueError("This class only supports height units")
-        else:
-            args["units"] = "height"
             
         # check if the boxes are not initialized
         if not hasattr(self, "boxes"):
