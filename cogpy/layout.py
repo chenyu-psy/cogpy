@@ -81,10 +81,6 @@ class stimBoxes(object):
             # check if the boxes are too wide
             if width*n + spacing*(n-1) > 2:
                 raise ValueError("The boxes are too wide to fit in the window")
-            
-            # the spacing between boxes
-            if spacing is None:
-                spacing = np.min((self.winW*0.9 - width*n) / (n-1),width)
                 
             # calculate the total width of the line and the leftmost x position
             lineW = width*n + spacing*(n-1)
@@ -99,10 +95,6 @@ class stimBoxes(object):
             # check if the boxes are too tall
             if height*n + spacing*(n-1) > 2:
                 raise ValueError("The boxes are too tall to fit in the window")
-            
-            # the spacing between boxes
-            if spacing is None:
-                spacing = np.min((self.winH*0.9 - height*n) / (n-1), height)
                 
             # calculate the total height of the line and the bottommost y position
             lineH = height*n + spacing*(n-1)
@@ -270,14 +262,19 @@ class stimBoxes(object):
             for box in self.boxes:
                 self.text[box] = TextStim(self.win, text=text[box], pos=self.boxes[box].pos, **args)
     
-    def stim_image(self, image:list|dict, **args):
+    def stim_image(self, image:list|dict, scale = "max", **args):
         '''Add image stimuli to the boxes
 
         Args:
             image (list|dict): The image stimuli to be added to the boxes.
                 If a list is provided, the images will be added to the boxes in order.
                 If a dictionary is provided, the images will be added to the boxes based on the keys.
-        '''
+        ''' 
+        
+        if args.get("units", "height") != "height":
+            raise ValueError("This class only supports height units")
+        else:
+            args["units"] = "height"
             
         # check if the boxes are not initialized
         if not hasattr(self, "boxes"):
@@ -292,11 +289,37 @@ class stimBoxes(object):
                 raise ValueError("The number of image stimuli should match the number of boxes")
             # add images to the boxes
             for i, box in enumerate(self.boxes):
+                # create the image object
                 self.images[box] = ImageStim(self.win, image=str(image[i]), pos=self.boxes[box].pos, **args)
+                # resize the image
+                if scale == "height":
+                    ratio = self.images[box].size[1]/self.box_args["height"]
+                elif scale == "width":
+                    ratio = self.images[box].size[0]/self.box_args["width"]
+                elif scale == "max":
+                    ratioW = self.images[box].size[0]/self.box_args["width"]
+                    ratioH = self.images[box].size[1]/self.box_args["height"]
+                    ratio = np.max([ratioW, ratioH])
+                else:
+                    ratio = 1
+                self.images[box].size = self.images[box].size/ratio
+                    
         elif isinstance(image, dict):
             # add images to the boxes
-            for box in self.boxes:
+            for box in image:
                 self.images[box] = ImageStim(self.win, image=str(image[box]), pos=self.boxes[box].pos, **args)
+                # resize the image
+                if scale == "height":
+                    ratio = self.images[box].size[1]/self.box_args["height"]
+                elif scale == "width":
+                    ratio = self.images[box].size[0]/self.box_args["width"]
+                elif scale == "max":
+                    ratioW = self.images[box].size[0]/self.box_args["width"]
+                    ratioH = self.images[box].size[1]/self.box_args["height"]
+                    ratio = np.max([ratioW, ratioH])
+                else:
+                    ratio = 1
+                self.images[box].size = self.images[box].size/ratio
     
     def stim_color(self, color:list|dict):
         '''Add color stimuli to the boxes
