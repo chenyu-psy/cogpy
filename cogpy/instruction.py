@@ -30,7 +30,7 @@ class instr_brief(object):
         self.duration = duration
         self.adaptive = adaptive
         self.args = args
-        self.button_args = button_args
+        self.button_args = {} if button_args is None else button_args
         
         if resp_type not in ["key", "button", "mouse"]:
             raise ValueError("Invalid response type")
@@ -62,9 +62,9 @@ class instr_brief(object):
     
     def __display_text(self):
         
-        if "wrapWidth" not in self.args: self.args["wrapWidth"] = 1.6
-        if "color" not in self.args: self.args["color"] = [-1,-1,-1]
-        if "height" not in self.args: self.args["height"] = 0.1
+        self.args["wrapWidth"] = self.args.get("wrapWidth", 1.6)
+        self.args["color"] = self.args.get("color", [-1,-1,-1])
+        self.args["height"] = self.args.get("height", 0.1)
         
         # create the text object
         text = visual.TextStim(self.win, text=self.content, **self.args)
@@ -93,10 +93,10 @@ class instr_brief(object):
     def __button_response(self):
         
         width = 0.05
-        if "width" not in self.button_args: self.button_args["width"] = (len(self.choice) + 1) * 0.5 * width
-        if "height" not in self.button_args: self.button_args["height"] = width
-        if "lineWidth" not in self.button_args: self.button_args["lineWidth"] = 2
-        if "fillColor" not in self.button_args: self.button_args["fillColor"] = "#669CD1"
+        self.button_args["width"] = self.button_args.get("width", (len(self.choice) + 1) * 0.5 * width)
+        self.button_args["height"] = self.button_args.get("height", width)
+        self.button_args["lineWidth"] = self.button_args.get("lineWidth", 2)
+        self.button_args["fillColor"] = self.button_args.get("fillColor", "#669CD1")
         
         # correct the choices
         if self.choice is None:
@@ -112,7 +112,7 @@ class instr_brief(object):
         start_time = core.getTime() 
         
         # Present stimulation but prohibit response
-        self.buttons.draw()
+        self.button.draw()
         self.win.flip()
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
         event.clearEvents() # clear events
@@ -124,9 +124,9 @@ class instr_brief(object):
         # Present stimulation and allow response
         while loop:
             
-            for button in self.buttons.boxes:
+            for button in self.button.boxes:
                 
-                if mouse.isPressedIn(self.buttons.boxes[button], buttons=[0]):
+                if mouse.isPressedIn(self.button.boxes[button], buttons=[0]):
                     self.rt = core.getTime() - start_time
                     
                     loop = False# initialize the loop
