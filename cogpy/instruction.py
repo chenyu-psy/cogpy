@@ -36,10 +36,8 @@ class instr_brief(object):
             raise ValueError("Invalid response type")
         
         if Path(content).exists():
-            print("Displaying image")
             self.__display_image()
         else:
-            print("Displaying text")
             self.__display_text()
     
     def __display_image(self):
@@ -104,9 +102,8 @@ class instr_brief(object):
         if self.choice is None:
             raise ValueError("You must provide at least one button")
         elif isinstance(self.choice, str):
-            self.buttons = stimBoxes(self.win, setsize = 1, **self.button_args)
-            self.buttons.__arrange_line(cent = [0, -0.45], spacing=width*0.5)
-            self.buttons.stim_text(text = [self.choice], height = width*0.8, color=[-1,-1,-1])
+            self.button = stimBoxes(self.win, setsize = 1, layout="line", center = [0, -0.45], **self.button_args)
+            self.button.stim_text(text = [self.choice], height = width*0.8, color=[-1,-1,-1])
         else:
             raise ValueError("if the response type is button, the choices must be string")
             
@@ -249,8 +246,7 @@ class instr_loop(object):
         if "fillColor" not in self.button_args: self.button_args["fillColor"] = "#669CD1"
         
         # correct the choices
-        self.buttons = stimBoxes(self.win, setsize = 2, **self.button_args)
-        self.buttons.__arrange_line(cent = [0, -0.45], spacing=width*0.5)
+        self.buttons = stimBoxes(self.win, setsize = 2, layout="line", center = [0, -0.45], **self.button_args)
         self.buttons.stim_text(text = ["Previous","Next"], height = width*0.8, color=[-1,-1,-1])
 
             
