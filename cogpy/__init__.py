@@ -4,7 +4,7 @@ from .instruction import instr_brief, instr_loop
 
 __all__ = [
     "stimBoxes",
-    "trial"
+    "trial",
     "instr_brief",
     "instr_loop"
 ]

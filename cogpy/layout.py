@@ -5,8 +5,53 @@ import warnings
 
 
 class stimBoxes(object):
+    ''' A class to arrange boxes in a circle, line, grid, or randomly and add text or image stimuli to the boxes
+
+    Args:
+        win: the window object from psychopy
+        setsize: the number of boxes
+        layout: the layout of the boxes. One of "circle", "line", "grid", "random", or "custom".
+        **args: additional arguments for the layout and the boxes (see below)
+        
+    Description:
+        The class can arrange the boxes in a circle, line, grid, or randomly.
+        
+        Layout-specific arguments:
+        
+        - Circle layout:
+            - center (list, optional): The center of the circle. Defaults to [0, 0].
+            - radius (float, optional): The radius of the circle. Defaults to 0.3.
+            - oval (float, optional): The ovalness of the circle. Defaults to 1.
+            - rotation (float, optional): The rotation of the circle in degrees. Defaults to 0.
+        
+        - Line layout:
+            - center (list, optional): The center of the line. Defaults to [0, 0].
+            - direction (str, optional): The direction of the line, either "horizontal" or "vertical". Defaults to "horizontal".
+            - spacing (float, optional): The spacing between boxes. Defaults to 0.
+        
+        - Grid layout:
+            - center (list, optional): The center of the grid. Defaults to [0, 0].
+            - nrow (int): The number of rows in the grid. (Required)
+            - ncol (int): The number of columns in the grid. (Required)
+            - spacing (list, optional): The spacing between boxes in the grid. Defaults to [0, 0].
+        
+        - Random layout:
+            - width (float, optional): The width of the area. Defaults to the window height.
+            - height (float, optional): The height of the area. Defaults to the window height.
+            - spacing (float, optional): The spacing between boxes. Defaults to 0.
+        
+        - Custom layout:
+            - positions (dict): A dictionary of positions for each box. The keys are the names of the boxes, and the values are the positions of the boxes. (Required)
+        
+        Common box arguments:
+            - width (float, optional): The width of each box. Defaults to 0.16.
+            - height (float, optional): The height of each box. Defaults to the width.
+            - lineColor (list, optional): The color of the box lines. Defaults to [-1, -1, -1].
+            - lineWidth (int, optional): The width of the box lines. Defaults to 3.
+            - units (str, optional): The units for the box dimensions. Must be "height".
+    '''
     
-    def __init__(self, win, setsize, **args):
+    def __init__(self, win, setsize, layout = "line", **args):
         self.win = win
         self.setsize = setsize
         self.box_args = args
@@ -14,22 +59,74 @@ class stimBoxes(object):
         self.winW = win.windowedSize[0]/win.windowedSize[1]*self.winH # window width
         
         # set up default arguments
-        if "width" not in args: args["width"] = 0.16
-        if "height" not in args: args["height"] = args["width"]
-        if "lineColor" not in args: args["lineColor"] = [-1,-1,-1]
-        if "lineWidth" not in args: args["lineWidth"] = 3
-        if args.get("units", "height") != "height":
+        self.box_args["width"] = self.box_args.get("width", 0.16)
+        self.box_args["height"] = self.box_args.get("height", self.box_args["width"])
+        self.box_args["lineColor"] = self.box_args.get("lineColor", [-1, -1, -1])
+        self.box_args["lineWidth"] = self.box_args.get("lineWidth", 3)
+
+        # Validate units and set them if correct
+        if self.box_args.get("units", "height") != "height":
             raise ValueError("This class only supports height units")
+        self.box_args["units"] = "height"
+        
+        # set up default arguments according to the layout
+        layout_args = {}
+        layout_args["center"] = args.pop("center", [0, 0])
+
+        
+        if layout == "circle":
+            # set up default arguments
+            layout_args["radius"] = args.pop("radius", 0.3)
+            layout_args["oval"] = args.pop("oval", 1)
+            layout_args["rotation"] = args.pop("rotation", 0)
+            # arrange the boxes in a circle
+            self.__arrange_circle(**layout_args)
+            
+        elif layout == "line":
+            # set up default arguments
+            layout_args["direction"] = args.pop("direction", "horizontal")
+            layout_args["spacing"] = args.pop("spacing", 0)
+            # arrange the boxes in a line
+            self.__arrange_line(**layout_args)
+            
+        elif layout == "grid":
+            # set up default arguments
+            if "nrow" not in args or "ncol" not in args:
+                raise ValueError("The number of rows and columns should be specified for the grid layout")
+            else:
+                layout_args["nrow"] = args.pop("nrow")
+                layout_args["ncol"] = args.pop("ncol")
+            layout_args["spacing"] = args.pop("spacing", [0,0])
+            # arrange the boxes in a grid
+            self.__arrange_grid(**layout_args)
+            
+        elif layout == "random":
+            # set up default arguments
+            layout_args["width"] = args.pop("width", self.winH)
+            layout_args["height"] = args.pop("height", self.winH)
+            layout_args["spacing"] = args.pop("spacing", 0)
+            # arrange the boxes randomly
+            self.__arrange_random(**layout_args)
+            
+        elif layout == "custom":
+            # set up default arguments
+            if "positions" not in args:
+                raise ValueError("The positions should be specified for the custom layout")
+            else:
+                layout_args["positions"] = args.pop("positions")
+            # arrange the boxes based on custom positions
+            self.__arrange_custom(**layout_args)
         else:
-            args["units"] = "height"
+            raise ValueError("The layout should be either circle, line, grid, random, or custom")
+
 
             
-    def arrange_circle(self, cent = [0,0], radius=0.3, oval=1, rotation=0):
+    def __arrange_circle(self, center = [0,0], radius=0.3, oval=1, rotation=0):
         '''Arrange the boxes in a circle
 
         Args:
             radius (float, optional): The radius of the circle. Defaults to 0.5.
-            cent (list, optional): The center of the circle. Defaults to [0,0].
+            center (list, optional): The center of the circle. Defaults to [0,0].
             oval (int, optional): The ovalness of the circle. 
                 A value larger than 1 will make the circle taller, 
                 while a value smaller than 1 will make the circle wider. 
@@ -56,18 +153,18 @@ class stimBoxes(object):
         theta = 2*np.pi/n # angle between boxes
         for i in range(self.setsize):
             # calculate the position of the box
-            x = radius*np.cos(-theta*i + rot) + cent[0]
-            y = radius*np.sin(-theta*i + rot)*oval + cent[1]
+            x = radius*np.cos(-theta*i + rot) + center[0]
+            y = radius*np.sin(-theta*i + rot)*oval + center[1]
             # set the position of the box
             self.boxes[f"P{i+1}"] = Rect(self.win, pos = [x, y], **self.box_args)
     
-    def arrange_line(self, cent=[0,0], direction="horizontal", spacing:float=0):
+    def __arrange_line(self, center=[0,0], direction="horizontal", spacing:float=0):
         '''Arrange the boxes in a line
 
         Args:
             direction (str, optional): The direction of the line. 
                 The default value is "horizontal".
-            cent (list, optional): The center of the line. Defaults to [0,0].
+            center (list, optional): The center of the line. Defaults to [0,0].
             spacing (float, optional): The spacing between boxes. Defaults to 0.
         '''
         n = self.setsize # number of boxes
@@ -84,11 +181,11 @@ class stimBoxes(object):
                 
             # calculate the total width of the line and the leftmost x position
             lineW = width*n + spacing*(n-1)
-            leftX = cent[0] - lineW/2
+            leftX = center[0] - lineW/2
         
             for i in range(n):
                 x = leftX + (i + 0.5)*width + i*spacing
-                self.boxes[f"P{i+1}"] = Rect(self.win, pos = [x, cent[1]], **self.box_args)
+                self.boxes[f"P{i+1}"] = Rect(self.win, pos = [x, center[1]], **self.box_args)
                 
         elif direction == "vertical":
             
@@ -98,20 +195,20 @@ class stimBoxes(object):
                 
             # calculate the total height of the line and the bottommost y position
             lineH = height*n + spacing*(n-1)
-            topY = cent[1] + lineH/2
+            topY = center[1] + lineH/2
 
             for i in range(n):
                 y = topY - (i + 0.5)*height - i*spacing
-                self.boxes[f"P{i+1}"] = Rect(self.win, pos = [cent[0], y], **self.box_args)
+                self.boxes[f"P{i+1}"] = Rect(self.win, pos = [center[0], y], **self.box_args)
     
-    def arrange_grid(self, nrow:int, ncol:int, cent=[0,0], spW:float|None=None, spH:float|None=None):
+    def __arrange_grid(self, nrow:int, ncol:int, center=[0,0], spacing = [0,0]):
         '''Arrange the boxes in a grid
 
         Args:
             nrow (int): The number of rows in the grid.
             ncol (int): The number of columns in the grid.
-            cent (list, optional): The center of the grid. Defaults to [0,0].
-            spacing (float, optional): The spacing between boxes. Defaults to None.
+            center (list, optional): The center of the grid. Defaults to [0,0].
+            spacing (list, optional): The spacing between boxes in the grid. Defaults to [0,0].
         '''
         n = self.setsize # number of boxes
         width = self.box_args["width"]
@@ -124,25 +221,20 @@ class stimBoxes(object):
             warnings.warn("There are empty spaces in the grid")
             
         # check if the boxes are too wide or too tall
-        if spW is not None:
-            if width*ncol + spW*(ncol-1) > self.winW*0.9:
-                raise ValueError("The boxes are too wide to fit in the window")
-        else:
-            spW = np.min((self.winW*0.9 - width*ncol) / (ncol-1), width)
-            
-        if spH is not None:
-            if height*nrow + spH*(nrow-1) > self.winH*0.9:
-                raise ValueError("The boxes are too tall to fit in the window")
-        else:
-            spH = np.min((self.winH*0.9 - height*nrow) / (nrow-1), height)
+        if width*ncol + spacing[0]*(ncol-1) > self.winW*0.9:
+            raise ValueError("The boxes are too wide to fit in the window")
+
+        if height*nrow + spacing[1]*(nrow-1) > self.winH*0.9:
+            raise ValueError("The boxes are too tall to fit in the window")
+
             
         # Calculate the total width and height of the grid
-        gridW = ncol * width + (ncol - 1) * spW
-        gridH = nrow * height + (nrow - 1) * spH
+        gridW = ncol * width + (ncol - 1) * spacing[0]
+        gridH = nrow * height + (nrow - 1) * spacing[1]
 
-        # Calculate offsets to center the grid at `cent`
-        leftX = cent[0] - gridW / 2
-        topY = cent[1] + gridH / 2
+        # Calculate offsets to center the grid at `center`
+        leftX = center[0] - gridW / 2
+        topY = center[1] + gridH / 2
 
         # Initialize the boxes
         self.boxes = {}
@@ -150,11 +242,11 @@ class stimBoxes(object):
         for i in range(n):
             row = i // ncol
             col = i % ncol
-            x = leftX + (col + 0.5) * width + col * spW
-            y = topY - (row + 0.5) * height - row * spH
+            x = leftX + (col + 0.5) * width + col * spacing[0]
+            y = topY - (row + 0.5) * height - row * spacing[1]
             self.boxes[f"P{i+1}"] = Rect(self.win, pos=[x, y], **self.box_args)
     
-    def arrange_random(self, width:float, height:float, spacing:float=0):
+    def __arrange_random(self, width:float, height:float, spacing:float=0):
         '''Randomly arrange the boxes
 
         Args:
@@ -205,7 +297,7 @@ class stimBoxes(object):
             y = topY - (row + 0.5)*cellHeight
             self.boxes[f"P{i+1}"] = Rect(self.win, pos = [x, y], **self.box_args)
     
-    def arrange_custom(self, positions:dict):
+    def __arrange_custom(self, positions:dict):
         '''Arrange the boxes based on custom positions
 
         Args:
@@ -321,39 +413,38 @@ class stimBoxes(object):
                     ratio = 1
                 self.images[box].size = self.images[box].size/ratio
     
-    def stim_color(self, color:list|dict):
-        '''Add color stimuli to the boxes
+    def stim_boxes(self, **args):
+        '''Assign different properties to the boxes
 
         Args:
-            color (list|dict): The color stimuli to be added to the boxes.
-                If a list is provided, the colors will be added to the boxes in order.
-                If a dictionary is provided, the colors will be added to the boxes based on the keys.
+            **args: The properties to be assigned to the boxes. Each argument should be a list with the same length as the number of boxes.
         '''
+        
+        # Check if each argument is a list and has the same length as the number of boxes
+        for arg in args:
+            if not isinstance(args[arg], list):
+                raise ValueError(f"{arg} should be a list")
+            if len(args[arg]) != self.setsize:
+                raise ValueError(f"The number of {arg} should match the number of boxes")
             
         # check if the boxes are not initialized
         if not hasattr(self, "boxes"):
             raise ValueError("The boxes are not initialized")
         
-        if isinstance(color, list):
-            # check if the number of color stimuli matches the number of boxes
-            if len(color) != len(self.boxes):
-                raise ValueError("The number of color stimuli should match the number of boxes")
-            # add colors to the boxes
-            for i, box in enumerate(self.boxes):
-                self.boxes[box].fillColor = color[i]
-        elif isinstance(color, dict):
-            # add colors to the boxes
-            for box in self.boxes:
-                self.boxes[box].fillColor = color[i]
+        # update the box arguments
+        for arg in args:
+            for i in range(self.setsize):
+                self.boxes[f"P{i+1}"].__setattr__(arg, args[arg][i])
+
     
-    def draw_boxes(self):
+    def __draw_boxes(self):
         '''Draw the boxes and text stimuli
         '''
         
         for box in self.boxes:
             self.boxes[box].draw()
     
-    def draw_text(self):
+    def __draw_text(self):
         '''Draw the text stimuli
         '''
         
@@ -363,7 +454,7 @@ class stimBoxes(object):
         for box in self.text:
             self.text[box].draw()
     
-    def draw_images(self):
+    def __draw_images(self):
         '''Draw the image stimuli
         '''
         
@@ -377,6 +468,7 @@ class stimBoxes(object):
         '''Draw the boxes and stimuli
         '''
         
-        if hasattr(self, "boxes"): self.draw_boxes()
-        if hasattr(self, "text"): self.draw_text()
-        if hasattr(self, "images"):self.draw_images()
+        if hasattr(self, "boxes"): self.__draw_boxes()
+        if hasattr(self, "images"):self.__draw_images()
+        if hasattr(self, "text"): self.__draw_text()
+        

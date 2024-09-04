@@ -37,12 +37,12 @@ class instr_brief(object):
         
         if Path(content).exists():
             print("Displaying image")
-            self.display_image()
+            self.__display_image()
         else:
             print("Displaying text")
-            self.display_text()
+            self.__display_text()
     
-    def display_image(self):
+    def __display_image(self):
         
          # create the image object
         image = visual.ImageStim(self.win, image=str(self.content), units='norm', **self.args)
@@ -56,13 +56,13 @@ class instr_brief(object):
         image.draw() # draw the image
         
         if self.resp_type == "key":
-            self.key_response()
+            self.__key_response()
         elif self.resp_type == "button":
-            self.button_response()
+            self.__button_response()
         elif self.resp_type == "mouse":
-            self.mouse_response()
+            self.__mouse_response()
     
-    def display_text(self):
+    def __display_text(self):
         
         if "wrapWidth" not in self.args: self.args["wrapWidth"] = 1.6
         if "color" not in self.args: self.args["color"] = [-1,-1,-1]
@@ -74,13 +74,13 @@ class instr_brief(object):
         text.draw()
         
         if self.resp_type == "key":
-            self.key_response()
+            self.__key_response()
         elif self.resp_type == "button":
-            self.button_response()
+            self.__button_response()
         elif self.resp_type == "mouse":
-            self.mouse_response()
+            self.__mouse_response()
         
-    def key_response(self):
+    def __key_response(self):
         
         self.win.flip()
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
@@ -92,7 +92,7 @@ class instr_brief(object):
         
         self.rt = core.getTime() - start_time
     
-    def button_response(self):
+    def __button_response(self):
         
         width = 0.05
         if "width" not in self.button_args: self.button_args["width"] = (len(self.choice) + 1) * 0.5 * width
@@ -105,7 +105,7 @@ class instr_brief(object):
             raise ValueError("You must provide at least one button")
         elif isinstance(self.choice, str):
             self.buttons = stimBoxes(self.win, setsize = 1, **self.button_args)
-            self.buttons.arrange_line(cent = [0, -0.45], spacing=width*0.5)
+            self.buttons.__arrange_line(cent = [0, -0.45], spacing=width*0.5)
             self.buttons.stim_text(text = [self.choice], height = width*0.8, color=[-1,-1,-1])
         else:
             raise ValueError("if the response type is button, the choices must be string")
@@ -138,7 +138,7 @@ class instr_brief(object):
             if core.getTime() - start_time > self.duration:
                 loop = False
     
-    def mouse_response(self):
+    def __mouse_response(self):
         
         self.win.flip()
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
@@ -182,13 +182,13 @@ class instr_loop(object):
             content = contents[page]
             
             if Path(content).exists():
-                manipulation = self.display_image(content)
+                manipulation = self.__display_image(content)
             else:
-                manipulation = self.display_text(content)
+                manipulation = self.__display_text(content)
             
             page += manipulation
                 
-    def display_image(self, image):
+    def __display_image(self, image):
         
          # create the image object
         image = visual.ImageStim(self.win, image=str(image), units='norm', **self.image_args)
@@ -202,15 +202,15 @@ class instr_loop(object):
         image.draw() # draw the image
         
         if self.resp_type == "key":
-            response = self.key_response()
+            response = self.__key_response()
         elif self.resp_type == "button":
-            response = self.button_response()
+            response = self.__button_response()
         
         manipulation = 1 if response in ["right","Next"] else -1
         
         return manipulation
     
-    def display_text(self, text):
+    def __display_text(self, text):
         
         if "wrapWidth" not in self.text_args: self.text_args["wrapWidth"] = 1.6
         if "color" not in self.text_args: self.text_args["color"] = [-1,-1,-1]
@@ -222,15 +222,15 @@ class instr_loop(object):
         text.draw()
         
         if self.resp_type == "key":
-            response = self.key_response()
+            response = self.__key_response()
         elif self.resp_type == "button":
-            response = self.button_response()
+            response = self.__button_response()
         
         manipulation = 1 if response in ["right","Next"] else -1
         
         return manipulation
     
-    def key_response(self):
+    def __key_response(self):
         
         self.win.flip()
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
@@ -240,7 +240,7 @@ class instr_loop(object):
         
         return response[0]
     
-    def button_response(self):
+    def __button_response(self):
         
         width = 0.05
         if "width" not in self.button_args: self.button_args["width"] = (len("previous") + 1) * 0.5 * width
@@ -250,7 +250,7 @@ class instr_loop(object):
         
         # correct the choices
         self.buttons = stimBoxes(self.win, setsize = 2, **self.button_args)
-        self.buttons.arrange_line(cent = [0, -0.45], spacing=width*0.5)
+        self.buttons.__arrange_line(cent = [0, -0.45], spacing=width*0.5)
         self.buttons.stim_text(text = ["Previous","Next"], height = width*0.8, color=[-1,-1,-1])
 
             

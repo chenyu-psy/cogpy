@@ -16,7 +16,7 @@ class trial(object):
             choices (list | object | None, optional): the choices for the response. Defaults to None.
             resp_start (int, optional): the time before the response is allowed. Defaults to 0.
             resp_end_trial (bool, optional): whether the trial ends after the response. Defaults to True.
-            duration (_type_, optional): the maximum duration of the trial. Defaults to float('inf').
+            duration (float, optional): the maximum duration of the trial. Defaults to float('inf').
             post_trial_gap (float, optional): the time after the trial. Defaults to 0.
 
         Raises:
@@ -39,7 +39,7 @@ class trial(object):
         if resp_type not in ["key", "button"]:
             raise ValueError("The response type is not recognized")
     
-    def key_response(self):
+    def __key_response(self):
         
         # correct the choices
         if self.choices is None:
@@ -77,7 +77,7 @@ class trial(object):
                 loop = False
 
     
-    def button_response(self):
+    def __button_response(self):
         
         # correct the choices
         if self.choices is None:
@@ -86,7 +86,7 @@ class trial(object):
             width = 0.08
             boxW = (np.max([len(e) for e in self.choices]) + 2) * 0.5 * width
             self.buttons = stimBoxes(self.win, setsize = len(self.choices), width = boxW, height = width)
-            self.buttons.arrange_line(cent = [0, -0.4], spacing=width*0.5)
+            self.buttons.__arrange_line(cent = [0, -0.4], spacing=width*0.5)
             self.buttons.stim_text(text = self.choices, height = width*0.8, color=[-1,-1,-1])
         elif all(isinstance(x, object) for x in self.choices):
             self.buttons = self.choices
@@ -127,9 +127,9 @@ class trial(object):
     def run(self):
         
         if self.resp_type == "key":
-            self.key_response()
+            self.__key_response()
         elif self.resp_type == "button":
-            self.button_response()
+            self.__button_response()
         
         if self.post_trial_gap > 0:
             self.win.flip()
