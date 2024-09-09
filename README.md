@@ -25,9 +25,6 @@ pip install git+https://github.com/chenyu-psy/cogpy.git
 import cogpy as cp
 from psychopy import core, visual
 
-import numpy as np
-import pandas as pd
-
 # open window
 win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
 
@@ -56,7 +53,7 @@ core.wait(20)
 
 ```python
 # %% Import libraries
-from cogpy import stimBoxes, trial
+import cogpy as cp
 from psychopy import core, visual
 
 # open window
