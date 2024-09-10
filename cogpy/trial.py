@@ -85,8 +85,10 @@ class trial(object):
         elif all(isinstance(x, str) for x in self.choices):
             width = 0.08
             boxW = (np.max([len(e) for e in self.choices]) + 2) * 0.5 * width
-            self.buttons = stimBoxes(self.win, setsize = len(self.choices), width = boxW, height = width)
-            self.buttons.__arrange_line(cent = [0, -0.4], spacing=width*0.5)
+            self.buttons = stimBoxes(
+                self.win, setsize = len(self.choices), layout="line", 
+                cent = [0, -0.4], spacing=width*0.5, 
+                width = boxW, height = width)
             self.buttons.stim_text(text = self.choices, height = width*0.8, color=[-1,-1,-1])
         elif all(isinstance(x, object) for x in self.choices):
             self.buttons = self.choices

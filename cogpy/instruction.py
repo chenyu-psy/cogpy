@@ -277,3 +277,84 @@ class instr_loop(object):
                 loop = False
         
         return response
+    
+
+
+    
+def instr_input(win, question, choice='enter', allowEmpty = True, duration = float('inf'), **args):
+    ''' Display a screen to ask the participant to input the information.
+
+    Args:
+        win (object): the window object of the experiment.
+        question (str): the question to ask the participant.
+        resp_type (str, optional): the type of response. It can be "key" or "button". Defaults to "key".
+        choice (str | None, optional): _description_. Defaults to None.
+        allowEmpty (bool, optional): whether the participant can leave the input empty. Defaults to True.
+        duration (float, optional): the maximum duration of the instruction. Defaults to float('inf').
+
+    Raises:
+        ValueError: Invalid response type
+    '''
+    
+    args['units'] = args.get('units', 'norm')
+    args['height'] = args.get('height', 0.15)
+    args['color'] = args.get('color', [-1,-1,-1])
+    
+    ques_args = args.copy()
+    ques_args['pos'] = ques_args.get('pos', [0,0.5])
+    
+    ans_args = args.copy()
+    ans_args['pos'] = [0,0]
+    
+    tip_args = args.copy()
+    tip_args['pos'] = [0,-0.7]
+    tip_args['height'] = 0.08
+    
+    keyNames = {
+        'return': 'Enter',
+        'space': 'Space',
+        'backspace': 'Backspace'
+    }
+    
+    question_text = visual.TextStim(win, text=question, **ques_args)
+    question_text.wrapWidth = 1.8
+    answer_text = visual.TextStim(win, text='', **ans_args)
+    tip_text = visual.TextStim(win, text=f"Press the '{keyNames[choice]}' key to continue", **tip_args)
+    tip_text.wrapWidth = 1.8
+    
+    # result
+    result = None
+    
+    # display the question and answer
+    question_text.draw()
+    answer_text.draw()
+    tip_text.draw()
+    win.flip()
+    
+    loop = True
+    start_time = core.getTime()
+    
+    while loop:
+        
+        if core.getTime() - start_time > duration:
+            loop = False
+        
+        for key in event.getKeys():
+            
+            if key == 'backspace':
+                answer_text.text = answer_text.text[:-1]
+            elif key == choice:
+                if not allowEmpty and answer_text.text == '':
+                    continue
+                else:
+                    result = answer_text.text
+                    loop = False
+            elif key in [chr(i) for i in range(97,123)]+[str(i) for i in range(11)]:
+                answer_text.text += key.upper()
+            
+        question_text.draw()
+        answer_text.draw()
+        tip_text.draw()
+        win.flip()
+    
+    return result

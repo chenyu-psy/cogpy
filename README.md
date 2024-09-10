@@ -49,8 +49,6 @@ core.wait(20)
 
 `trial` is a class that helps to present stimuli and collect responses. It supports both keyboard and button responses.
 
-### Keyboard response
-
 ```python
 # %% Import libraries
 import cogpy as cp
@@ -70,6 +68,8 @@ test_trial = trial(
     stimuli = [circle_boxes], 
     resp_type = "key", 
     choices = ['space'], 
+    # resp_type = "button", 
+    # choices = ['hello', 'world'], 
     resp_start = 3, 
     resp_end_trial = True, 
     duration = 20)
@@ -80,32 +80,66 @@ print(results)
 
 ```
 
-### Button response
+## Intructions
+
+There are three functions that you can used to simplify the process of creating instructions: `instr_brief`, `instr_loop`, and `instr_input`.
+
+### instr_brief
+
+`instr_brief` is used to present a brief instruction. It supports both text and image instructions.
 
 ```python
+
 # %% Import libraries
-from psychopy import core, visual
 import cogpy as cp
+from psychopy import core, visual
 
 # open window
 win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
 
-circle_boxes = cp.stimBoxes(
-    win, setsize = 6, 
-    layout="circle", radius = 0.3, rotation=120,
-    width = 0.2, lineColor=[-1,-1,-1], fillColor = [1,1,1])
-circle_boxes.stim_text(text = ['A','B','C','D','E','F'], height = 0.08, color="#bababa")
+instr_brief(win, text = "This is a brief instruction.")
 
-test_trial = trial(
+```
+
+### instr_loop
+
+`instr_loop` is used to present a loop of instructions. Participants can either press the arrow keys or the buttons on the screen to navigate to the next or previous instructions. It supports both text and image instructions.
+
+```python
+
+# %% Import libraries
+import cogpy as cp
+from psychopy import core, visual
+
+# open window
+win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
+
+instr_loop(
     win, 
-    stimuli = [circle_boxes], 
-    resp_type = "button", 
-    choices = ['hello', 'world'], 
-    resp_start = 3, 
-    resp_end_trial = True, 
-    duration = 20)
+    contents = [
+        "This is the first instruction.", 
+        "This is the second instruction."], 
+    resp_type = "button")
 
-test_trial.run()
-results = test_trial.get_response()
-print(results)
+```
+
+### instr_input
+
+`instr_input` is used to present an instruction that requires participants to input a response.
+
+```python
+
+# %% Import libraries
+import cogpy as cp
+from psychopy import core, visual
+
+# open window
+win = visual.Window(size=[1600,900],color=[1,1,1], fullscr=False)
+
+cp.instr_input(
+    win, 
+    question = "Please enter your participant ID", 
+    choice='return', 
+    duration=10)
+
 ```
