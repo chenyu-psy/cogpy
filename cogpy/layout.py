@@ -351,8 +351,8 @@ class stimBoxes(object):
                 self.text[box] = TextStim(self.win, text=text[i], pos=self.boxes[box].pos, **args)
         elif isinstance(text, dict):
             # add text to the boxes
-            for box in self.boxes:
-                self.text[box] = TextStim(self.win, text=text[box], pos=self.boxes[box].pos, **args)
+            for box,content in text.items():
+                self.text[box] = TextStim(self.win, text=content, pos=self.boxes[box].pos, **args)
     
     def stim_image(self, image:list|dict, scale = "max", **args):
         '''Add image stimuli to the boxes
@@ -398,8 +398,8 @@ class stimBoxes(object):
                     
         elif isinstance(image, dict):
             # add images to the boxes
-            for box in image:
-                self.images[box] = ImageStim(self.win, image=str(image[box]), pos=self.boxes[box].pos, **args)
+            for box, content in image.items():
+                self.images[box] = ImageStim(self.win, image=str(content), pos=self.boxes[box].pos, **args)
                 # resize the image
                 if scale == "height":
                     ratio = self.images[box].size[1]/self.box_args["height"]

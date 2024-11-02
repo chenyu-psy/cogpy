@@ -20,12 +20,13 @@ class instr_brief(object):
         **args: additional arguments for the text or image object
     '''
     
-    def __init__(self, win, content:str, resp_type = "key", choice=None, adaptive=True, resp_start = 0.5, duration = float('inf'), button_args=None, **args):
+    def __init__(self, win, content:str, resp_type = "key", choice=None, adaptive=True, resp_start = 0.5, duration = float('inf'), button_args=None, quit_key = "escape", **args):
         
         self.win = win
         self.content = content
         self.resp_type = resp_type
         self.choice = choice
+        self.quit_key = quit_key
         self.resp_start = resp_start
         self.duration = duration
         self.adaptive = adaptive
@@ -86,7 +87,16 @@ class instr_brief(object):
         
         start_time = core.getTime() # start timing
         
-        event.waitKeys(maxWait=self.duration,keyList=self.choice)
+        while (core.getTime() - start_time) <= self.duration:
+            
+            keys = event.getKeys()
+            
+            if self.quit_key in keys:
+                self.win.close()
+                core.quit()
+            
+            if set(keys).intersection(self.choice):
+                break
         
         self.rt = core.getTime() - start_time
     
@@ -124,6 +134,12 @@ class instr_brief(object):
         # Present stimulation and allow response
         while loop:
             
+            keys = event.getKeys()
+            
+            if self.quit_key in keys:
+                self.win.close()
+                core.quit()
+            
             for button in self.button.boxes:
                 
                 if mouse.isPressedIn(self.button.boxes[button], buttons=[0]):
@@ -158,7 +174,7 @@ class instr_brief(object):
 
 class instr_loop(object):
     
-    def __init__(self, win, contents:list, resp_type = "key", adaptive=True, resp_start = 0.5, duration = float('inf'), button_args={}, text_args={}, image_args={}):
+    def __init__(self, win, contents:list, resp_type = "key", adaptive=True, resp_start = 0.5, duration = float('inf'), quit_key = "escape", button_args={}, text_args={}, image_args={}):
         
         self.win = win
         self.contents = contents
@@ -166,6 +182,7 @@ class instr_loop(object):
         self.resp_start = resp_start
         self.duration = duration
         self.adaptive = adaptive
+        self.quit_key = quit_key
         self.button_args = button_args
         self.text_args = text_args
         self.image_args = image_args
@@ -233,9 +250,17 @@ class instr_loop(object):
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
         event.clearEvents() # clear events
         
-        response = event.waitKeys(maxWait=self.duration,keyList=["left","right"])
+        while True:
+            
+            keys = event.getKeys()
         
-        return response[0]
+            if "right" in keys:
+                return "right"
+            elif "left" in keys:
+                return "left"
+            elif self.quit_key in keys:
+                self.win.close()
+                core.quit()
     
     def __button_response(self):
         
@@ -266,6 +291,12 @@ class instr_loop(object):
         # Present stimulation and allow response
         while loop:
             
+            keys = event.getKeys()
+            
+            if self.quit_key in keys:
+                self.win.close()
+                core.quit()
+            
             for button in self.buttons.boxes:
                 
                 if mouse.isPressedIn(self.buttons.boxes[button], buttons=[0]):
@@ -281,7 +312,7 @@ class instr_loop(object):
 
 
     
-def instr_input(win, question, choice='enter', allowEmpty = True, duration = float('inf'), **args):
+def instr_input(win, question, choice='enter', allowEmpty = True, duration = float('inf'), quit_key="escape", **args):
     ''' Display a screen to ask the participant to input the information.
 
     Args:
@@ -351,6 +382,9 @@ def instr_input(win, question, choice='enter', allowEmpty = True, duration = flo
                     loop = False
             elif key in [chr(i) for i in range(97,123)]+[str(i) for i in range(11)]:
                 answer_text.text += key.upper()
+            elif key == quit_key:
+                win.close()
+                core.quit()
             
         question_text.draw()
         answer_text.draw()

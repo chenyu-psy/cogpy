@@ -64,7 +64,7 @@ class trial(object):
         while loop:
             
             # get the response
-            keys = event.getKeys(keyList=self.choices)
+            keys = event.getKeys()
             
             # check if the quit key is pressed
             if self.quit_key in keys:
@@ -72,7 +72,7 @@ class trial(object):
                 core.quit()
             
             # check if the response is correct
-            if self.response is None and len(keys) > 0:
+            if self.response is None and set(keys).intersection(self.choices):
                 self.response = keys
                 self.rt = core.getTime() - start_time
                 
