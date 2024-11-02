@@ -23,11 +23,13 @@ class trial(object):
             ValueError: The response type is not recognized
         '''
     
-    def __init__(self, win, stimuli:list, resp_type = "key", choices:list|object|None=None, resp_start=0, resp_end_trial=True, duration=float('inf'), post_trial_gap=0):
+    def __init__(self, win, stimuli:list, resp_type = "key", choices:list|object|None=None, resp_start=0, resp_end_trial=True, duration=float('inf'), post_trial_gap=0, quit_key="escape"):
+        
         self.win = win
         self.stimuli = stimuli
         self.resp_type = resp_type
         self.choices = choices
+        self.quit_key = quit_key
         self.resp_start = resp_start
         self.resp_end_trial = resp_end_trial
         self.duration = duration
@@ -63,6 +65,11 @@ class trial(object):
             
             # get the response
             keys = event.getKeys(keyList=self.choices)
+            
+            # check if the quit key is pressed
+            if self.quit_key in keys:
+                self.win.close()
+                core.quit()
             
             # check if the response is correct
             if self.response is None and len(keys) > 0:
@@ -112,6 +119,11 @@ class trial(object):
         
         # Present stimulation and allow response
         while loop:
+            
+            # check if the quit key is pressed
+            if self.quit_key in event.getKeys():
+                self.win.close()
+                core.quit()
             
             for button in self.buttons.boxes:
                 
