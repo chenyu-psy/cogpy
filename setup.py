@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cogpy',
-    version='0.1.2',
+    version='0.1.3',
     description='This is a psychopy plugin for cognitive psychology experiments',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
@@ -14,6 +14,11 @@ setup(
         'psychopy',
         'pandas'
     ],
+    extras_require={
+        "Windows": [],  # No additional dependency for Windows
+        "macOS": ["pyobjc-framework-Quartz"],
+        "Linux": ["python-xlib"],
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
