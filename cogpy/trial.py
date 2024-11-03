@@ -89,6 +89,10 @@ class trial(object):
         # correct the choices
         if self.choices is None:
             raise ValueError("You must provide at least one button")
+        elif isinstance(self.choices, object):
+            self.buttons = self.choices
+        elif isinstance(self.choices, str):
+            raise ValueError("if the response type is button, the choices must be either a list of strings or stimBoxes")
         elif all(isinstance(x, str) for x in self.choices):
             width = 0.08
             boxW = (np.max([len(e) for e in self.choices]) + 2) * 0.5 * width
@@ -97,8 +101,6 @@ class trial(object):
                 center = [0, -0.4], spacing=width*0.5, 
                 width = boxW, height = width)
             self.buttons.stim_text(text = self.choices, height = width*0.8, color=[-1,-1,-1])
-        elif all(isinstance(x, object) for x in self.choices):
-            self.buttons = self.choices
         else:
             raise ValueError("if the response type is button, the choices must be either a list of strings or stimBoxes")
             
