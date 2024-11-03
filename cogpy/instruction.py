@@ -81,6 +81,12 @@ class instr_brief(object):
         
     def __key_response(self):
         
+        # check if the choice is a list
+        if self.choice is None:
+            self.choice = ["NO_KEY"]
+        elif isinstance(self.choice, str):
+            self.choice = [self.choice]
+        
         self.win.flip()
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
         event.clearEvents() # clear events
@@ -245,6 +251,12 @@ class instr_loop(object):
         return manipulation
     
     def __key_response(self):
+        
+        # check if the choice is a list
+        if self.choice is None:
+            self.choice = ["NO_KEY"]
+        elif isinstance(self.choice, str):
+            self.choice = [self.choice]
         
         self.win.flip()
         core.wait(self.resp_start) # wait for 0.5 second to avoid accidental touch
