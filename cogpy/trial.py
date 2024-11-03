@@ -130,7 +130,10 @@ class trial(object):
             for button in self.buttons.boxes:
                 
                 if mouse.isPressedIn(self.buttons.boxes[button], buttons=[0]):
-                    self.response = self.buttons.text[button].text
+                    try:
+                        self.response = self.buttons.text[button].text
+                    except:
+                        self.response = self.buttons.images[button].image
                     self.rt = core.getTime() - start_time
                     
                     if self.resp_end_trial:
