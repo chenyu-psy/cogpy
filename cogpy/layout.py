@@ -354,13 +354,14 @@ class stimBoxes(object):
             for box,content in text.items():
                 self.text[box] = TextStim(self.win, text=content, pos=self.boxes[box].pos, **args)
     
-    def stim_image(self, image:list|dict, scale = "max", **args):
+    def stim_image(self, image:list|dict, scale = 1, **args):
         '''Add image stimuli to the boxes
 
         Args:
             image (list|dict): The image stimuli to be added to the boxes.
                 If a list is provided, the images will be added to the boxes in order.
                 If a dictionary is provided, the images will be added to the boxes based on the keys.
+            scale (float, optional): The scaling factor for the images. Defaults to 1.
         ''' 
         
         if args.get("units", "height") != "height":
@@ -384,17 +385,10 @@ class stimBoxes(object):
                 # create the image object
                 self.images[box] = ImageStim(self.win, image=str(image[i]), pos=self.boxes[box].pos, **args)
                 # resize the image
-                if scale == "height":
-                    ratio = self.images[box].size[1]/self.box_args["height"]
-                elif scale == "width":
-                    ratio = self.images[box].size[0]/self.box_args["width"]
-                elif scale == "max":
-                    ratioW = self.images[box].size[0]/self.box_args["width"]
-                    ratioH = self.images[box].size[1]/self.box_args["height"]
-                    ratio = np.max([ratioW, ratioH])
-                else:
-                    ratio = 1
-                self.images[box].size = self.images[box].size/ratio
+                ratioW = self.images[box].size[0]/self.box_args["width"]
+                ratioH = self.images[box].size[1]/self.box_args["height"]
+                ratio = np.max([ratioW, ratioH])
+                self.images[box].size = self.images[box].size/ratio * scale
                     
         elif isinstance(image, dict):
             # add images to the boxes
