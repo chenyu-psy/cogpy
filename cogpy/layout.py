@@ -395,17 +395,10 @@ class stimBoxes(object):
             for box, content in image.items():
                 self.images[box] = ImageStim(self.win, image=str(content), pos=self.boxes[box].pos, **args)
                 # resize the image
-                if scale == "height":
-                    ratio = self.images[box].size[1]/self.box_args["height"]
-                elif scale == "width":
-                    ratio = self.images[box].size[0]/self.box_args["width"]
-                elif scale == "max":
-                    ratioW = self.images[box].size[0]/self.box_args["width"]
-                    ratioH = self.images[box].size[1]/self.box_args["height"]
-                    ratio = np.max([ratioW, ratioH])
-                else:
-                    ratio = 1
-                self.images[box].size = self.images[box].size/ratio
+                ratioW = self.images[box].size[0]/self.box_args["width"]
+                ratioH = self.images[box].size[1]/self.box_args["height"]
+                ratio = np.max([ratioW, ratioH])
+                self.images[box].size = self.images[box].size/ratio * scale
     
     def stim_boxes(self, **args):
         '''Assign different properties to the boxes
