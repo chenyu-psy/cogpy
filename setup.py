@@ -11,7 +11,7 @@ setup(
     url='https://github.com/chenyu-psy/cogpy.git',
     packages=find_packages(),
     install_requires=[
-        'psychopy[core, event, visual]',
+        'psychopy',
         'pandas'
     ],
     extras_require={
